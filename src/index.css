@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+img {
+  width: 100%;
+  height: auto;
+}
+.img-card {
+  width: 150px;
+}
+
+.border {
+  border:1px solid black;
+}
+.App {
+  min-height: 100vh;
+}

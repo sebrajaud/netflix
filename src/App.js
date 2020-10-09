@@ -1,26 +1,72 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component , lazy, Suspense } from 'react';
+import {Header} from './components';
+import { ThemeContext } from './theme/theme-context';
+import { themes } from './theme/theme-context';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import { fetchFavoris } from './store/actions';
+import { connect } from 'react-redux'
+
+const LazyFilms = lazy( () => import(/* webpackChunkName: "Films" */'./features/films') )
+
+
+const LazyFavoris = lazy( () => import(/* webpackChunkName: "Favoris" */'./features/favoris') )
+
+
+class App extends Component {
+
+  
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      theme: themes.light.classes,
+      toggleTheme: this.toggleTheme,
+    }
+  }
+
+ 
+
+  toggleTheme = () => {
+    if(this.state.theme === themes.light.classes ) {
+      this.setState({
+        theme:  themes.dark.classes,
+      })
+    }else {
+      this.setState({
+        theme:  themes.light.classes,
+      })
+    }
+  }
+  
+
+  
+
+  componentDidMount(){
+    this.props.fetchFavoris();
+  }
+
+  render() {
+    return (
+      <ThemeContext.Provider value={this.state} >
+        
+          <div className="App d-flex flex-column">
+            <Header />
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Switch>
+                  <Route path="/film" component={LazyFilms}/>
+                  <Route path="/favoris" component={LazyFavoris} />
+                  <Redirect to="/film" />
+              </Switch>
+            </Suspense>
+            
+          </div>
+        
+      </ThemeContext.Provider>
+    );
+  }
 }
 
-export default App;
+export default withRouter(connect(null, {
+  fetchFavoris
+})(App));
